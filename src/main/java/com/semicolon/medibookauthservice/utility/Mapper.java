@@ -3,7 +3,6 @@ package com.semicolon.medibookauthservice.utility;
 import com.semicolon.medibookauthservice.data.models.AuthUser;
 import com.semicolon.medibookauthservice.dto.request.RegisterRequest;
 import com.semicolon.medibookauthservice.dto.response.AuthResponse;
-import org.springframework.security.authorization.AuthenticatedReactiveAuthorizationManager;
 
 public class Mapper {
 
