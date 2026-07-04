@@ -12,5 +12,7 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, UUID> {
 
     Optional<AuthUser> findByEmail(String email);
 
+    Optional<AuthUser> findByRefreshToken(String refreshToken);
+
     boolean existsByEmail(@NotBlank(message = "Email is required") @Email(message = "Invalid email format") String email);
 }

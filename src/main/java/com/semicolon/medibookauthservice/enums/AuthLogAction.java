@@ -1,6 +1,6 @@
 package com.semicolon.medibookauthservice.enums;
 
-public enum Status {
-    SUCCESS,
-    FAILED
+public enum AuthLogAction {
+    LOGIN,
+    REGISTER
 }

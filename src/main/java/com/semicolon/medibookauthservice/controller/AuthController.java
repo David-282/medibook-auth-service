@@ -9,6 +9,7 @@ import com.semicolon.medibookauthservice.exception.InvalidCredentialsException;
 import com.semicolon.medibookauthservice.exception.UserAlreadyExistException;
 import com.semicolon.medibookauthservice.exception.UserNotFoundException;
 import com.semicolon.medibookauthservice.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,13 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse> register(@Valid @RequestBody RegisterRequest request,
+                                                HttpServletRequest httpRequest
+                                                ) {
         try {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(ApiResponse.success("Registration successful", authService.register(request)));
+                    .body(ApiResponse.success("Registration successful", authService.register(request, httpRequest.getRemoteAddr())));
         } catch (UserAlreadyExistException e) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
@@ -41,10 +44,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest request,
+                                             HttpServletRequest httpRequest
+                                             ) {
         try {
             return ResponseEntity
-                    .ok(ApiResponse.success("Login successful", authService.login(request)));
+                    .ok(ApiResponse.success("Login successful", authService.login(request, httpRequest.getRemoteAddr())));
         } catch (UserNotFoundException e) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
@@ -56,6 +61,35 @@ public class AuthController {
         } catch (InvalidCredentialsException e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse> refresh(@RequestBody String refreshToken) {
+        try {
+            return ResponseEntity
+                    .ok(ApiResponse.success("Token refreshed", authService.refresh(refreshToken)));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (InvalidCredentialsException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse> logout(@RequestBody String refreshToken) {
+        try {
+            authService.logout(refreshToken);
+            return ResponseEntity
+                    .ok(ApiResponse.success("Logout successful", null));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error(e.getMessage()));
         }
     }

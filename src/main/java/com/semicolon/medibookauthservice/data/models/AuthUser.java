@@ -4,6 +4,7 @@ import com.semicolon.medibookauthservice.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -25,4 +26,8 @@ public class AuthUser {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    private String refreshToken;
+
+    private Instant refreshTokenExpiry;
 }

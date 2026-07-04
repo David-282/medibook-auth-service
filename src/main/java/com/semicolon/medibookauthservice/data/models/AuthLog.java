@@ -1,6 +1,7 @@
 package com.semicolon.medibookauthservice.data.models;
 
-import com.semicolon.medibookauthservice.enums.Status;
+import com.semicolon.medibookauthservice.enums.AuthLogAction;
+import com.semicolon.medibookauthservice.enums.AuthStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,7 +25,11 @@ public class AuthLog {
     private String ipAddress;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private AuthStatus status;
+
+
+    @Enumerated(EnumType.STRING)
+    private AuthLogAction action;
 
     @CreationTimestamp
     private Instant createdAt;
