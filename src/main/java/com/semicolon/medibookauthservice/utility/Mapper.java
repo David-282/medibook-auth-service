@@ -1,10 +1,12 @@
 package com.semicolon.medibookauthservice.utility;
 
 import com.semicolon.medibookauthservice.data.models.AuthUser;
+import com.semicolon.medibookauthservice.dto.event.UserRegisteredEvent;
 import com.semicolon.medibookauthservice.dto.request.RegisterRequest;
 import com.semicolon.medibookauthservice.dto.response.AuthResponse;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public class Mapper {
 
@@ -30,5 +32,17 @@ public class Mapper {
         response.setRefreshToken(authUser.getRefreshToken());
 
         return response;
+    }
+
+    public static UserRegisteredEvent map(UUID id, RegisterRequest request){
+
+        return new UserRegisteredEvent(
+                id,
+                request.getEmail(),
+                request.getFirstName(),
+                request.getLastName(),
+                request.getPhoneNumber(),
+                request.getRole()
+        );
     }
 }

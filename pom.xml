@@ -113,11 +113,22 @@
             <scope>runtime</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>me.paulschwarz</groupId>-->
 <!--            <artifactId>spring-dotenv</artifactId>-->
 <!--            <version>4.0.0</version>-->
 <!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

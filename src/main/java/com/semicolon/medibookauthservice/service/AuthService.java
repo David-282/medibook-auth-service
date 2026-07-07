@@ -4,6 +4,7 @@ import com.semicolon.medibookauthservice.data.models.AuthLog;
 import com.semicolon.medibookauthservice.data.models.AuthUser;
 import com.semicolon.medibookauthservice.data.repository.AuthLogRepository;
 import com.semicolon.medibookauthservice.data.repository.AuthUserRepository;
+import com.semicolon.medibookauthservice.dto.event.UserRegisteredEvent;
 import com.semicolon.medibookauthservice.dto.request.LoginRequest;
 import com.semicolon.medibookauthservice.dto.request.RegisterRequest;
 import com.semicolon.medibookauthservice.dto.response.AuthResponse;
@@ -13,6 +14,7 @@ import com.semicolon.medibookauthservice.exception.AccountDeactivatedException;
 import com.semicolon.medibookauthservice.exception.InvalidCredentialsException;
 import com.semicolon.medibookauthservice.exception.UserAlreadyExistException;
 import com.semicolon.medibookauthservice.exception.UserNotFoundException;
+import com.semicolon.medibookauthservice.kafka.producer.AuthEventProducer;
 import com.semicolon.medibookauthservice.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,6 +43,9 @@ public class AuthService {
     private  JwtUtil jwtUtil;
 
     @Autowired
+    private AuthEventProducer authEventProducer;
+
+    @Autowired
     private  AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest request,String ipAddress) {
@@ -54,6 +59,10 @@ public class AuthService {
         authUserRepository.save(authUser);
 
         saveLog(authUser, ipAddress, AuthStatus.SUCCESS,AuthLogAction.REGISTER);
+
+        UserRegisteredEvent event = map(authUser.getId(),request);
+        authEventProducer.publishUserRegisteredEvent(event);
+
         String token = jwtUtil.generateToken(authUser);
 
         return map(authUser, token);
