@@ -10,6 +10,7 @@ import com.semicolon.medibookauthservice.exception.UserAlreadyExistException;
 import com.semicolon.medibookauthservice.exception.UserNotFoundException;
 import com.semicolon.medibookauthservice.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Transactional
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> register(@Valid @RequestBody RegisterRequest request,
                                                 HttpServletRequest httpRequest
