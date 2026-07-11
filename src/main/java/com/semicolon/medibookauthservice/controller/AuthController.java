@@ -15,10 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -77,6 +74,26 @@ public class AuthController {
         } catch (InvalidCredentialsException e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/validate")
+    public ResponseEntity<ApiResponse> validateToken(@RequestParam String token) {
+        try {
+            return ResponseEntity
+                    .ok(ApiResponse.success("Token is valid", authService.validateToken(token)));
+        } catch (InvalidCredentialsException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (AccountDeactivatedException e) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error(e.getMessage()));
         }
     }

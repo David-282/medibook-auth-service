@@ -16,6 +16,7 @@ import com.semicolon.medibookauthservice.exception.UserAlreadyExistException;
 import com.semicolon.medibookauthservice.exception.UserNotFoundException;
 import com.semicolon.medibookauthservice.kafka.producer.AuthEventProducer;
 import com.semicolon.medibookauthservice.security.JwtUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -48,6 +49,7 @@ public class AuthService {
     @Autowired
     private  AuthenticationManager authenticationManager;
 
+    @Transactional
     public AuthResponse register(RegisterRequest request,String ipAddress) {
         if (authUserRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistException("Email already exists");
@@ -69,6 +71,7 @@ public class AuthService {
     }
 
 
+    @Transactional
     public AuthResponse login(LoginRequest request, String ipAddress) {
         try {
             authenticationManager.authenticate(
@@ -98,6 +101,7 @@ public class AuthService {
 
     }
 
+    @Transactional
     public AuthResponse refresh(String refreshToken) {
         AuthUser authUser = authUserRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new UserNotFoundException("Invalid refresh token"));
@@ -116,6 +120,7 @@ public class AuthService {
     }
 
 
+    @Transactional
     public void logout(String refreshToken) {
         AuthUser authUser = authUserRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new UserNotFoundException("Invalid refresh token"));
@@ -124,6 +129,28 @@ public class AuthService {
         authUser.setRefreshTokenExpiry(null);
         authUserRepository.save(authUser);
     }
+
+    @Transactional
+    public AuthResponse validateToken(String token) {
+        if (!jwtUtil.validateToken(token)) {
+            throw new InvalidCredentialsException("Invalid or expired token");
+        }
+
+        String email = jwtUtil.extractEmail(token);
+        AuthUser authUser = authUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!authUser.getIsActive()) {
+            throw new AccountDeactivatedException("Account is deactivated");
+        }
+
+        return map(authUser, token);
+//        AuthResponse response = new AuthResponse();
+//        response.setToken(token);
+//        response.setRole(authUser.getRole());
+//        response.setUserId(authUser.getId());
+    }
+
 
     private String generateRefreshToken() {
         return java.util.UUID.randomUUID().toString();
