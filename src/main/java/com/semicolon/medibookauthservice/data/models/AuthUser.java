@@ -1,5 +1,6 @@
 package com.semicolon.medibookauthservice.data.models;
 
+import com.semicolon.medibookauthservice.enums.AccountStatus;
 import com.semicolon.medibookauthservice.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -9,7 +10,10 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "auth_user")
+@Table(name = "auth_users", indexes = {
+
+        @Index(name = "idx_auth_user_email", columnList = "email", unique = true)
+})
 public class AuthUser {
 
     @Id
@@ -20,9 +24,11 @@ public class AuthUser {
     private String email;
 
     @Column(nullable = false)
-    private String PasswordHash;
+    private String passwordHash;
 
-    private Boolean isActive = true;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status", nullable = false)
+    private AccountStatus accountStatus = AccountStatus.PENDING_PROFILE;
 
     @Enumerated(EnumType.STRING)
     private Role role;
