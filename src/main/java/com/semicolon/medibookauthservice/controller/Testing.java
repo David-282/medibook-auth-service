@@ -2,7 +2,6 @@ package com.semicolon.medibookauthservice.controller;
 
 
 import com.semicolon.medibookauthservice.dto.event.UserProfileCreationFailedEvent;
-import com.semicolon.medibookauthservice.dto.request.LoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
